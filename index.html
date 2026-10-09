@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard de Vendas — Clube Bancorbrás</title>
+<style>
+:root{--bg:#000;--card:#0c0c0e;--line:#222226;--tx:#f2f2f4;--mut:#9a9aa4;--a25:#8b95a8;--a26:#22d3ee;--up:#34d399;--dn:#f87171;--gold:#fbbf24;--warn:#fb923c}
+*{box-sizing:border-box}
+html,body{margin:0;background:#000;color:var(--tx);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding:28px 16px 60px}
+header h1{font-size:clamp(24px,4vw,36px);margin:0 0 6px;letter-spacing:-.02em}
+header p{margin:0;color:var(--mut);max-width:80ch}
+.tag{display:inline-block;font-size:12px;padding:3px 10px;border:1px solid var(--line);border-radius:99px;color:var(--mut);margin-bottom:12px}
+section{margin-top:40px}
+h2{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
+.sub{color:var(--mut);margin:0 0 16px;max-width:90ch}
+.how{border-left:3px solid var(--a26);background:var(--card);padding:10px 14px;border-radius:0 8px 8px 0;color:#cfcfd6;font-size:14px;margin-bottom:16px}
+.how b{color:var(--tx)}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.kpi .l{font-size:13px;color:var(--mut)}
+.kpi .v{font-size:36px;font-weight:700;letter-spacing:-.02em;margin:4px 0 2px;font-variant-numeric:tabular-nums}
+.kpi .d{font-size:13px;color:var(--mut)}
+.up{color:var(--up)}.dn{color:var(--dn)}.mut{color:var(--mut)}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.pill.up{background:#34d3991f}.pill.dn{background:#f871711f}
+.legend{display:flex;gap:18px;font-size:13px;color:var(--mut);margin-bottom:10px;flex-wrap:wrap}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+#chart{width:100%;height:auto;display:block}
+.tw{overflow-x:auto;margin-top:14px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;min-width:560px}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);font-size:14px}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0;background:var(--card)}
+tr.tot td{font-weight:700;border-top:2px solid #3a3a40;background:#111114}
+tr.na td{color:#666}
+.tabs{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.tabs button{background:none;border:0;color:var(--mut);padding:8px 16px;font:inherit;font-size:14px;cursor:pointer}
+.tabs button.on{background:var(--a26);color:#000;font-weight:700}
+.tabs button:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.two{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+.rk{list-style:none;margin:0;padding:0}
+.rk li{display:grid;grid-template-columns:34px 1fr auto;gap:4px 12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.rk li:last-child{border:0}
+.pos{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:#1b1b1f;color:var(--mut)}
+.rk li:first-child .pos{background:var(--gold);color:#000}
+.rk li:first-child .nm{color:var(--gold);font-weight:700}
+.nm{font-size:14px;overflow-wrap:anywhere}
+.n{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+.n small{display:block;font-weight:400;color:var(--mut);font-size:12px}
+.bar{grid-column:2/4;height:8px;border-radius:99px;background:#17171a;overflow:hidden}
+.bar span{display:block;height:100%;background:var(--a26);border-radius:99px}
+.rk li:first-child .bar span{background:var(--gold)}
+.note{font-size:12px;color:var(--mut);margin-top:10px}
+.cls{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.cls .v{font-size:34px;font-weight:700;font-variant-numeric:tabular-nums}
+.cls .t{font-weight:600}
+.cls .e{font-size:13px;color:var(--mut)}
+.cls .s{font-size:13px;margin-top:8px;color:#cfcfd6;border-top:1px solid var(--line);padding-top:8px}
+.stack{display:flex;height:26px;border-radius:8px;overflow:hidden;margin:6px 0 8px;background:#17171a}
+.stack div{height:100%}
+.insights{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.insights li{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-size:15px}
+footer{margin-top:40px;color:var(--mut);font-size:12px;border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <span class="tag">Clube Bancorbrás · Vendas fechadas · jan/2025 a set/2026</span>
+  <h1>Dashboard Gerencial de Vendas</h1>
+  <p>Visão resumida para decisão: como as vendas evoluíram mês a mês entre 2025 e 2026, quais origens e campanhas mais vendem e quanto do resultado ainda não tem origem registrada.</p>
+</header>
+
+<section>
+  <h2>1. Resumo executivo</h2>
+  <p class="sub">Os números mais importantes em uma olhada.</p>
+  <div class="grid kpis" id="kpis"></div>
+  <ul class="insights" id="ins" style="margin-top:14px"></ul>
+</section>
+
+<section>
+  <h2>2. Comparativo mês a mês: 2025 × 2026</h2>
+  <p class="sub">Cada mês de 2026 comparado com o mesmo mês de 2025, em quantidade de vendas e em percentual.</p>
+  <div class="how"><b>Como ler:</b> a variação em quantidade é "vendas de 2026 − vendas de 2025". A variação em % mostra quanto isso representa sobre 2025. <span class="up">Verde</span> = cresceu · <span class="dn">vermelho</span> = caiu. Out, Nov e Dez/2026 ainda não aconteceram, então não há comparação.</div>
+  <div class="card">
+    <div class="legend"><span><i style="background:var(--a25)"></i>2025</span><span><i style="background:var(--a26)"></i>2026</span></div>
+    <svg id="chart" viewBox="0 0 1100 340" role="img" aria-label="Vendas por mês, 2025 comparado com 2026"></svg>
+    <div class="tw"><table id="tbl"></table></div>
+  </div>
+</section>
+
+<section>
+  <h2>3. Top 5 fontes e campanhas que mais venderam</h2>
+  <p class="sub">Ordem decrescente de vendas. Escolha o período para comparar.</p>
+  <div class="tabs" id="tabs" role="tablist">
+    <button data-k="all" class="on">2025 + 2026</button><button data-k="2025">Só 2025</button><button data-k="2026">Só 2026</button>
+  </div>
+  <div class="grid two">
+    <div class="card"><h3 style="margin:0 0 4px">Top 5 Fontes</h3><div class="mut" style="font-size:13px">De onde veio o cliente</div><ol class="rk" id="rkF"></ol></div>
+    <div class="card"><h3 style="margin:0 0 4px">Top 5 Campanhas</h3><div class="mut" style="font-size:13px">Qual ação gerou a venda</div><ol class="rk" id="rkC"></ol></div>
+  </div>
+  <p class="note">Os rankings não incluem "Sem Fonte" e "Sem campanha" (contabilizados na seção 4). "5 VD - Sem Campanha Ativa" é uma campanha cadastrada no sistema (venda ativa sem ação específica) e por isso entra no ranking. O % é sobre o total de vendas do período.</p>
+</section>
+
+<section>
+  <h2>4. Vendas sem fonte e sem campanha</h2>
+  <p class="sub">Vendas que não têm origem registrada. Sem esse registro não dá para saber o que gerou o resultado nem medir retorno.</p>
+  <div class="how"><b>Como ler:</b> cada venda cai em apenas um grupo: <b>só sem fonte</b>, <b>só sem campanha</b>, <b>ambos</b> (sem fonte e sem campanha) ou <b>completa</b> (tem fonte e campanha).</div>
+  <div class="tabs" id="tabs2"><button data-k="all" class="on">2025 + 2026</button><button data-k="2025">Só 2025</button><button data-k="2026">Só 2026</button></div>
+  <div class="grid cls" id="cls"></div>
+  <div class="card" style="margin-top:14px"><div class="t" style="font-weight:600">Composição das vendas do período</div><div class="stack" id="stack"></div><div class="legend" id="stackLg"></div></div>
+</section>
+
+<footer>Fonte dos dados: planilha "Vendas 2025 e 2026 Clube" (15.800 negociações com estado "Vendida", fechadas de 02/01/2025 a 30/09/2026). "Sem fonte" = campo Fonte igual a "Sem Fonte"; "sem campanha" = campo Campanha igual a "Sem campanha". Registros "Desconhecido"/"unknown" na fonte não foram contados como sem fonte.</footer>
+</div>
+
+<script>
+const D={"monthly": {"2025": [789, 589, 575, 571, 562, 505, 677, 671, 660, 622, 1514, 801], "2026": [841, 677, 983, 581, 526, 605, 1233, 853, 965, 0, 0, 0]}, "cls": {"2025": {"total": 8536, "sf_only": 81, "sc_only": 855, "both": 2044, "sf": 2125, "sc": 2899, "ok": 5556}, "2026": {"total": 7264, "sf_only": 161, "sc_only": 1037, "both": 1818, "sf": 1979, "sc": 2855, "ok": 4248}, "all": {"total": 15800, "sf_only": 242, "sc_only": 1892, "both": 3862, "sf": 4104, "sc": 5754, "ok": 9804}}, "fonte": {"2025": [["01 VD - Prospecção ativa", 2656], ["02 VD - Receptivo", 1444], ["Buzzlead", 865], ["07 VD - Indicação Externa (Amigos, parentes, etc)", 251], ["Tráfego Direto", 245]], "2026": [["01 VD - Prospecção ativa", 2067], ["02 VD - Receptivo", 1006], ["Buzzlead", 478], ["Importação Manual", 328], ["Busca Paga | Facebook Ads", 259]], "all": [["01 VD - Prospecção ativa", 4723], ["02 VD - Receptivo", 2450], ["Buzzlead", 1343], ["07 VD - Indicação Externa (Amigos, parentes, etc)", 482], ["Importação Manual", 469]]}, "camp": {"2025": [["3 VD - Indicação", 1394], ["4 VD - Reativação", 1102], ["buzzlead", 863], ["5 VD - Sem Campanha Ativa", 593], ["P3-[Gruv] [Hotsite - Geral] [Mai/23] Automação Hotsite 2023", 436]], "2026": [["3 VD - Indicação", 1180], ["4 VD - Reativação", 841], ["buzzlead", 474], ["[Gruv][Jun/25]-Meta Native", 273], ["Nova análise de propostas (Jan a Out/25)", 189]], "all": [["3 VD - Indicação", 2574], ["4 VD - Reativação", 1943], ["buzzlead", 1337], ["5 VD - Sem Campanha Ativa", 770], ["P3-[Gruv] [Hotsite - Geral] [Mai/23] Automação Hotsite 2023", 516]]}, "fonte_raw": [["01 VD - Prospecção ativa", 4723], ["Sem Fonte", 4104], ["02 VD - Receptivo", 2450], ["Buzzlead", 1343], ["07 VD - Indicação Externa (Amigos, parentes, etc)", 482], ["Importação Manual", 469]]};
+const MES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const AB=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const fmt=n=>n.toLocaleString('pt-BR');
+const pc=(n,d=1)=>(n>=0?'+':'−')+Math.abs(n).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d})+'%';
+const sg=n=>(n>=0?'+':'−')+fmt(Math.abs(n));
+const cls=n=>n>=0?'up':'dn';
+const a=D.monthly['2025'],b=D.monthly['2026'];
+const nM=9; // meses fechados em 2026 (jan–set)
+const s25=a.reduce((x,y)=>x+y,0), s26=b.reduce((x,y)=>x+y,0);
+const y25=a.slice(0,nM).reduce((x,y)=>x+y,0);
+const dY=s26-y25, pY=dY/y25*100;
+const var_=a.map((v,i)=>i<nM?{q:b[i]-v,p:(b[i]-v)/v*100}:null);
+
+// KPIs
+document.getElementById('kpis').innerHTML=`
+<div class="card kpi"><div class="l">Vendas 2025 (ano inteiro)</div><div class="v">${fmt(s25)}</div><div class="d">Jan–Set/2025: ${fmt(y25)}</div></div>
+<div class="card kpi"><div class="l">Vendas 2026 (jan a set)</div><div class="v" style="color:var(--a26)">${fmt(s26)}</div><div class="d">9 meses fechados</div></div>
+<div class="card kpi"><div class="l">Jan–Set: 2026 vs 2025</div><div class="v ${cls(dY)}">${pc(pY)}</div><div class="d">${sg(dY)} vendas no mesmo período</div></div>
+<div class="card kpi"><div class="l">Vendas sem fonte e/ou sem campanha</div><div class="v" style="color:var(--warn)">${fmt(D.cls.all.total-D.cls.all.ok)}</div><div class="d">${(100*(D.cls.all.total-D.cls.all.ok)/D.cls.all.total).toLocaleString('pt-BR',{maximumFractionDigits:1})}% do total (${fmt(D.cls.all.total)})</div></div>`;
+
+// Insights
+let best=0,worst=0;var_.forEach((v,i)=>{if(!v)return;if(v.p>var_[best].p)best=i;if(v.p<var_[worst].p)worst=i});
+const up=var_.filter(v=>v&&v.q>0).length;
+const top25=a.indexOf(Math.max(...a)), top26=b.indexOf(Math.max(...b));
+document.getElementById('ins').innerHTML=[
+`De janeiro a setembro, 2026 vendeu <b class="${cls(dY)}">${fmt(Math.abs(dY))} ${dY>=0?'a mais':'a menos'}</b> que 2025 (${pc(pY)}). Em <b>${up} de ${nM}</b> meses o resultado superou o mesmo mês do ano anterior.`,
+`Melhor desempenho relativo: <b>${MES[best]}</b> (${pc(var_[best].p)}, ${sg(var_[best].q)} vendas). Pior: <b>${MES[worst]}</b> (${pc(var_[worst].p)}, ${sg(var_[worst].q)} vendas).`,
+`Maior mês de 2025: <b>${MES[top25]}</b> (${fmt(a[top25])} vendas). Maior mês de 2026 até agora: <b>${MES[top26]}</b> (${fmt(b[top26])}). Novembro/2025 é o pico a ser superado.`,
+`<b>${(100*D.cls.all.both/D.cls.all.total).toLocaleString('pt-BR',{maximumFractionDigits:1})}%</b> das vendas (${fmt(D.cls.all.both)}) estão sem fonte <i>e</i> sem campanha, uma lacuna relevante para medir o retorno de marketing.`
+].map(t=>`<li>${t}</li>`).join('');
+
+// Chart
+(function(){
+ const W=1100,H=340,L=44,B=34,T=14,iw=W-L-10,ih=H-B-T,max=Math.ceil(Math.max(...a,...b)/400)*400;
+ let s='';
+ for(let i=0;i<=4;i++){const v=max/4*i,y=T+ih-ih*v/max;s+=`<line x1="${L}" x2="${W-10}" y1="${y}" y2="${y}" stroke="#222226"/><text x="${L-8}" y="${y+4}" fill="#9a9aa4" font-size="11" text-anchor="end">${fmt(v)}</text>`}
+ const g=iw/12,bw=g*.32;
+ for(let i=0;i<12;i++){
+  const x=L+g*i+g/2, h1=ih*a[i]/max, h2=ih*b[i]/max;
+  s+=`<rect x="${x-bw-1}" y="${T+ih-h1}" width="${bw}" height="${h1}" rx="3" fill="#8b95a8"><title>${MES[i]}/2025: ${fmt(a[i])}</title></rect>`;
+  if(i<nM)s+=`<rect x="${x+1}" y="${T+ih-h2}" width="${bw}" height="${h2}" rx="3" fill="#22d3ee"><title>${MES[i]}/2026: ${fmt(b[i])}</title></rect>`;
+  if(i<nM)s+=`<text x="${x+1+bw/2}" y="${T+ih-h2-5}" fill="#22d3ee" font-size="10" text-anchor="middle">${fmt(b[i])}</text>`;
+  s+=`<text x="${x-bw/2-1}" y="${T+ih-h1-5}" fill="#9a9aa4" font-size="10" text-anchor="middle">${fmt(a[i])}</text>`;
+  s+=`<text x="${x}" y="${H-12}" fill="#f2f2f4" font-size="12" text-anchor="middle">${AB[i]}</text>`;
+ }
+ document.getElementById('chart').innerHTML=s;
+})();
+
+// Table
+let t=`<thead><tr><th>Mês</th><th>2025</th><th>2026</th><th>Variação (qtd)</th><th>Variação (%)</th></tr></thead><tbody>`;
+for(let i=0;i<12;i++){
+ if(var_[i]) t+=`<tr><td>${MES[i]}</td><td>${fmt(a[i])}</td><td>${fmt(b[i])}</td><td class="${cls(var_[i].q)}">${sg(var_[i].q)}</td><td><span class="pill ${cls(var_[i].p)}">${pc(var_[i].p)}</span></td></tr>`;
+ else t+=`<tr class="na"><td>${MES[i]}</td><td>${fmt(a[i])}</td><td>—</td><td>—</td><td>sem dados 2026</td></tr>`;
+}
+t+=`<tr class="tot"><td>Jan–Set (comparável)</td><td>${fmt(y25)}</td><td>${fmt(s26)}</td><td class="${cls(dY)}">${sg(dY)}</td><td><span class="pill ${cls(pY)}">${pc(pY)}</span></td></tr>`;
+t+=`<tr class="tot"><td>Ano 2025 completo</td><td>${fmt(s25)}</td><td>—</td><td>—</td><td>—</td></tr></tbody>`;
+document.getElementById('tbl').innerHTML=t;
+
+// Rankings
+function rank(id,arr,total){
+ const m=arr[0][1];
+ document.getElementById(id).innerHTML=arr.map((r,i)=>`<li><span class="pos">${i+1}</span><span class="nm">${r[0]}</span><span class="n">${fmt(r[1])}<small>${(100*r[1]/total).toLocaleString('pt-BR',{maximumFractionDigits:1})}% do total</small></span><div class="bar"><span style="width:${100*r[1]/m}%"></span></div></li>`).join('');
+}
+function tabs(id,fn){
+ const el=document.getElementById(id);
+ el.addEventListener('click',e=>{const bt=e.target.closest('button');if(!bt)return;el.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===bt));fn(bt.dataset.k)});
+}
+const upd=k=>{rank('rkF',D.fonte[k],D.cls[k].total);rank('rkC',D.camp[k],D.cls[k].total)};
+tabs('tabs',upd);upd('all');
+
+// Classificação
+function cl(k){
+ const c=D.cls[k],p=n=>(100*n/c.total).toLocaleString('pt-BR',{maximumFractionDigits:1})+'%';
+ const items=[
+  ['Só sem fonte','Tem campanha, mas a fonte não foi registrada',c.sf_only,'#fb923c'],
+  ['Só sem campanha','Tem fonte, mas sem campanha',c.sc_only,'#fbbf24'],
+  ['Ambos','Sem fonte e sem campanha',c.both,'#f87171'],
+  ['Completas','Fonte e campanha registradas',c.ok,'#34d399']];
+ document.getElementById('cls').innerHTML=items.map(i=>`<div class="card" style="border-top:3px solid ${i[3]}"><div class="t">${i[0]}</div><div class="v" style="color:${i[3]}">${fmt(i[2])}</div><div class="e">${i[1]}</div><div class="s">${p(i[2])} das vendas</div></div>`).join('')
+ +`<div class="card"><div class="t">Totais por campo</div><div class="e" style="margin-top:6px">Sem fonte (todas): <b style="color:var(--tx)">${fmt(c.sf)}</b></div><div class="e">Sem campanha (todas): <b style="color:var(--tx)">${fmt(c.sc)}</b></div><div class="s">Soma de "só" + "ambos"</div></div>`;
+ document.getElementById('stack').innerHTML=items.map(i=>`<div style="width:${100*i[2]/c.total}%;background:${i[3]}" title="${i[0]}: ${fmt(i[2])}"></div>`).join('');
+ document.getElementById('stackLg').innerHTML=items.map(i=>`<span><i style="background:${i[3]}"></i>${i[0]} ${p(i[2])}</span>`).join('');
+}
+tabs('tabs2',cl);cl('all');
+</script>
+</body>
+</html>
